@@ -13,18 +13,17 @@ const Board = (() => {
   return { grid };
 })();
 
-// Factory function for Players
+// Module for Display Controller
 
-const Player = (name) => {
-  const getName = () => name;
-
-  return { getName };
-}
-
-// Factory function for Game
-
-const Game = (gameboard) => {
-  const displayBoard = () => {
+const DisplayController = (() => {
+  const _clearBoard = () => {
+    while (gameArea.firstChild) {
+      gameArea.lastChild.remove();
+    }
+  }
+  
+  const displayBoard = (gameboard) => {
+    _clearBoard();
     gameboard.forEach(row => {
       row.forEach(square => {
         let space = document.createElement("div");
@@ -35,7 +34,23 @@ const Game = (gameboard) => {
     })
   }
 
-  return { displayBoard };
+    return { displayBoard };
+})();
+
+// Factory function for Players
+
+const Player = (name) => {
+  const getName = () => name;
+
+  return { getName };
+}
+
+// Factory function for Game
+
+const Game = () => {
+
+
+  return {  };
 }
 
 // Factory function for Spaces <-- May not need this...
