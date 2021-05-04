@@ -10,7 +10,20 @@ const Board = (() => {
     [" ", " ", " "]
   ];
 
-  return { grid };
+  const winningRows = () => {
+    return [
+    [ grid[0][0], grid[0][1], grid[0][2] ],
+    [ grid[1][0], grid[1][1], grid[1][2] ],
+    [ grid[2][0], grid[2][1], grid[2][2] ],
+    [ grid[0][0], grid[1][0], grid[2][0] ],
+    [ grid[0][1], grid[1][1], grid[2][1] ],
+    [ grid[0][2], grid[1][2], grid[2][2] ],
+    [ grid[0][0], grid[1][1], grid[2][2] ],
+    [ grid[2][0], grid[1][1], grid[0][2] ],
+  ]
+};
+
+  return { grid, winningRows };
 })();
 
 // Module for Display Controller
@@ -24,12 +37,25 @@ const DisplayController = (() => {
   
   const displayBoard = (gameboard) => {
     _clearBoard();
+    let i = 0;
     gameboard.forEach(row => {
       row.forEach(square => {
         let space = document.createElement("div");
         space.textContent = square;
         space.classList.add("space");
+        space.setAttribute("position", `${i}`);
         gameArea.appendChild(space);
+        i++;
+      })
+    })
+    // TODO: Break this out into submethods
+    spaces = document.querySelectorAll(".space");
+    spaces.forEach(space => {
+      space.addEventListener("click", () => {
+        if(!space.classList.contains("clicked")) {
+          space.textContent = "X";
+          space.classList.add("clicked");
+        }
       })
     })
   }
@@ -39,29 +65,63 @@ const DisplayController = (() => {
 
 // Factory function for Players
 
-const Player = (name) => {
+const Player = (name, symbol) => {
   const getName = () => name;
+  const getSymbol = () => symbol;
 
-  return { getName };
+  return { getName, getSymbol };
 }
 
 // Factory function for Game
 
 const Game = () => {
+  const _wonRow = (row) => {
+    return row.every(square => square == "X" || square == "O");
+  }
+  
+  const _winner = () => {
+    return Board.winningRows().some(row => {
+      return _wonRow(row);
+    })
+  }
 
+  const _fullBoard = () => {
+    return Board.grid.every(row => {
+      return row.every(square => square !== " ");
+    })
+  }
+  
+  const _gameOver = () => {
+    return _winner() || _fullBoard();
+  }
 
-  return {  };
+  const play = () => {
+    while(true) {    
+      if(_gameOver()) {
+        // Win or draw message
+        console.log("Game is over!");
+        break;
+      }
+      // Display whose turn it is
+
+      // "Turn" function that waits for player to click on a square
+      //     and then fills the square in
+      let y = prompt("Y coordinate?");
+      let x = prompt("X coordinate?");
+      let mark = prompt("'X' or 'O'?");
+      Board.grid[y][x] = mark;
+      DisplayController.displayBoard(Board.grid);
+      // Switches player
+    }
+  }
+
+  return { play };
 }
 
-// Factory function for Spaces <-- May not need this...
+// Game script
 
-// const Space = (contents = " ") => {
-//   let value = contents;
-//   return { value };
-// }
+playerX = Player("John", "X");
+playerY = Player("Jane", "O");
 
-  // const grid = [
-  //   [Space(), Space(), Space()],
-  //   [Space(), Space(), Space()],
-  //   [Space(), Space(), Space()]
-  // ];
+// Can I collect the player names from DOM?
+
