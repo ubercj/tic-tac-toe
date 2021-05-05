@@ -111,6 +111,8 @@ input, select {
 }
 
 body {
+  display: flex;
+  flex-direction: column;
   font-size: 16px;
 }
 
@@ -119,9 +121,14 @@ h1 {
   text-align: center;
 }
 
+button:hover {
+    cursor: pointer;
+}
+
 .container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .game-area {
