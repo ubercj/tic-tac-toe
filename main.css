@@ -105,7 +105,6 @@ input, select {
 =======================================
 =======================================
 */
-
 * {
   box-sizing: border-box;
 }
@@ -114,21 +113,12 @@ body {
   display: flex;
   flex-direction: column;
   font-size: 16px;
-  background-color: rgb(70, 124, 70);
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
-h1 {
-  font-size: 2em;
-  text-align: center;
-  margin: 10px;
-}
-
-button:hover {
-    cursor: pointer;
-}
-
-.is-turn {
-  box-shadow: hotpink 5px 5px 5px 5px;
+header {
+  background-color: cadetblue;
+  border-bottom: 3px solid rgb(182, 182, 182);
 }
 
 .container {
@@ -143,15 +133,55 @@ button:hover {
   align-items: center;
 }
 
-.board {
-  width: 100%;
-  border: 1px solid gray;
+
+/* ==========================
+Text Elements
+=========================== */
+
+h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin: 10px;
 }
 
-.player-area {
-  border: 1px solid cyan;
-  width: 30%;
-  height: 505.2px;
+h3 {
+  margin-top: 10px;
+  font-size: 1.75rem;
+}
+
+/* ==========================
+Buttons
+=========================== */
+button {
+  border-radius: 5px;
+  border: 1px solid gray;
+  background-color: rgb(91, 91, 243);
+  font-size: 1.15rem;
+  font-family: inherit;
+  padding: 10px;
+}
+
+button:hover {
+    cursor: pointer;
+    background-color: rgb(58, 58, 185);
+}
+
+.game-area button {
+  position: absolute;
+  top: 33%;
+  width: 125px;
+}
+
+.new-game {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* ==========================
+Game Board
+=========================== */
+.board {
+  width: 100%;
 }
 
 .game-area {
@@ -159,29 +189,97 @@ button:hover {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   justify-items: center;
-  gap: 2px;
-  border: 1px solid red;
-  padding: 5px;
+  padding: 8px;
   width: 40%;
   height: 505.2px;
+  background-color: rgb(114, 175, 155);
+  border-left: 3px solid rgb(182, 182, 182);
+  border-right: 3px solid rgb(182, 182, 182);
 }
 
 .space {
   text-align: center;
-  font-size: 3em;
-  border: 1px solid black;
+  font-size: 2rem;
   width: 100%;
   height: 163.067px;
 }
 
+.space[x-position="0"],
+.space[x-position="1"] {
+  border-right: 2px solid black;
+}
+
+.space[y-position="0"],
+.space[y-position="1"] {
+  border-bottom: 2px solid black;
+}
+
 .space:hover {
     cursor: pointer;
+    background-color: rgb(92, 151, 132);
+}
+
+.x-background {
+  background: url(photos/X.png) no-repeat;
+  background-size: contain;
+}
+
+.o-background {
+  background: url(photos/O.png) no-repeat;
+  background-size: contain;
 }
 
 .overlay {
   position: absolute;
-  background-color: rgba(252, 127, 189, 0.904);
+  background-color: rgba(152, 134, 219, 0.95);
   z-index: 1;
   width: 100%;
   height: 100%;
+  font-size: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.overlay p {
+  margin-top: 25px;
+  font-weight: bold;
+}
+
+/* ==========================
+Player Areas
+=========================== */
+.player-area {
+  width: 30%;
+  height: 505.2px;
+}
+
+.player1 {
+  background: rgb(155, 155, 155) url(photos/X.png) 50% 70% no-repeat;
+  background-size: 200px;
+}
+
+.player2 {
+  background: rgb(155, 155, 155) url(photos/O.png) 50% 70% no-repeat;
+  background-size: 200px;
+}
+
+.is-turn {
+  border: 3px solid yellow;
+  background-size: 200px;
+}
+
+/* ==========================
+Forms
+=========================== */
+form {
+  margin-top: 20px;
+}
+
+input {
+  height: 40px;
+  width: 200px;
+  padding-left: 8px;
+  font-size: 1rem;
+  font-family: inherit;
 }

@@ -1,9 +1,8 @@
 // DOM elements
 const gameArea = document.querySelector(".game-area");
-const ticker = document.querySelector(".ticker");
 const newGameButton = document.querySelector(".new-game");
-const player1Area = document.querySelector(".player1");
-const player2Area = document.querySelector(".player2");
+const playerXArea = document.querySelector(".player1");
+const playerOArea = document.querySelector(".player2");
 
 // Global variables
 let playerX;
@@ -44,12 +43,16 @@ const DisplayController = (() => {
   }
   
   const _clearInfo = () => {
-    while (player1Area.firstChild) {
-      player1Area.lastChild.remove();
+    while (playerXArea.firstChild) {
+      playerXArea.lastChild.remove();
     }
-    while (player2Area.firstChild) {
-      player2Area.lastChild.remove();
+    while (playerOArea.firstChild) {
+      playerOArea.lastChild.remove();
     }
+    playerXArea.classList.remove("is-turn");
+    playerOArea.classList.remove("is-turn");
+    playerX = null;
+    playerY = null;
   }
 
   const resetBoard = () => {
@@ -88,11 +91,15 @@ const DisplayController = (() => {
         if(!space.classList.contains("clicked")) {
           space.classList.add("clicked");
           Board.grid[y][x] = currentPlayer.getSymbol();
-          space.textContent = currentPlayer.getSymbol();
+          
+          if (currentPlayer.getSymbol() == "X") {
+            space.classList.add("x-background");
+          } else {
+            space.classList.add("o-background");
+          }
+
           newGame.checkWinCondition();
-          ticker.textContent = `It's ${currentPlayer.getName()}'s turn.`;
         }
-        // DisplayController.refreshBoard();
       })
     })
   }
@@ -134,7 +141,7 @@ const Game = () => {
     let endGameOverlay = document.createElement("div");
     endGameOverlay.classList.add("overlay");
     let endGameText = document.createElement("p");
-    if (_winner) {
+    if (_winner()) {
       endGameText.textContent = `${currentPlayer.getName()} wins!`
     } else {
       endGameText.textContent = "It's a draw!"
@@ -150,7 +157,6 @@ const Game = () => {
 
   const checkWinCondition = () => {
     if (_gameOver()) {
-      console.log(`${currentPlayer.getName()} wins!!`);
       _gameOverMessage();
     } else {
       switchPlayer();
@@ -164,7 +170,7 @@ const Game = () => {
       console.log("Game is over!");
     }
     // Display whose turn it is
-    player1Area.classList.add("is-turn");
+    playerXArea.classList.add("is-turn");
 
   }
 
@@ -195,7 +201,7 @@ function newGameCallback() {
 
   // Form for playerX name
   let form1 = document.createElement("form");
-  player1Area.appendChild(form1);
+  playerXArea.appendChild(form1);
   let setXSymbol = document.createElement("input");
   setXSymbol.setAttribute("type", "hidden");
   setXSymbol.setAttribute("name", "symbol");
@@ -217,19 +223,18 @@ function newGameCallback() {
     e.preventDefault();
     let nameData = e.target.elements;
     playerX = Player(nameData.name.value, nameData.symbol.value);
-    console.log(playerX.getName(), playerX.getSymbol());
 
-    player1Area.removeChild(form1);
+    playerXArea.removeChild(form1);
 
     let playerXName = document.createElement("h3");
     playerXName.classList.add("player-name");
     playerXName.textContent = playerX.getName();
-    player1Area.appendChild(playerXName);
+    playerXArea.appendChild(playerXName);
   })
 
   // Form for playerO name
   let form2 = document.createElement("form");
-  player2Area.appendChild(form2);
+  playerOArea.appendChild(form2);
   let setOSymbol = document.createElement("input");
   setOSymbol.setAttribute("type", "hidden");
   setOSymbol.setAttribute("name", "symbol");
@@ -251,21 +256,24 @@ function newGameCallback() {
     e.preventDefault();
     let nameData = e.target.elements;
     playerO = Player(nameData.name.value, nameData.symbol.value);
-    console.log(playerO.getName(), playerO.getSymbol());
 
-    player2Area.removeChild(form2);
+    playerOArea.removeChild(form2);
 
     let playerOName = document.createElement("h3");
     playerOName.classList.add("player-name");
     playerOName.textContent = playerO.getName();
-    player2Area.appendChild(playerOName);
+    playerOArea.appendChild(playerOName);
   })
 }
 
 const switchPlayer = () => {
   if (currentPlayer == playerX) {
     currentPlayer = playerO;
+    playerXArea.classList.remove("is-turn");
+    playerOArea.classList.add("is-turn");
   } else {
     currentPlayer = playerX;
+    playerOArea.classList.remove("is-turn");
+    playerXArea.classList.add("is-turn");
   }
 }
