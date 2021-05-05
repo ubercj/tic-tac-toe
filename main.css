@@ -146,6 +146,7 @@ h1 {
 
 h3 {
   margin-top: 10px;
+  margin-bottom: 30px;
   font-size: 1.75rem;
 }
 
@@ -252,6 +253,11 @@ Player Areas
 .player-area {
   width: 30%;
   height: 505.2px;
+}
+
+.player-area p {
+  color: green;
+  font-weight: bold;
 }
 
 .player1 {
