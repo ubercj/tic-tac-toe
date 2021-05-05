@@ -1,10 +1,17 @@
 // DOM elements
 const gameArea = document.querySelector(".game-area");
 const ticker = document.querySelector(".ticker");
-const startButton = document.querySelector(".start");
+const newGameButton = document.querySelector(".new-game");
+const player1Area = document.querySelector(".player1");
+const player2Area = document.querySelector(".player2");
+
+// Global variables
+let playerX;
+let playerO;
+let currentPlayer;
+let newGame;
 
 // Module for Game Board
-
 const Board = (() => {
   const grid = [
     [" ", " ", " "],
@@ -29,11 +36,19 @@ const Board = (() => {
 })();
 
 // Module for Display Controller
-
 const DisplayController = (() => {
   const _clearBoard = () => {
     while (gameArea.firstChild) {
       gameArea.lastChild.remove();
+    }
+  }
+  
+  const _clearInfo = () => {
+    while (player1Area.firstChild) {
+      player1Area.lastChild.remove();
+    }
+    while (player2Area.firstChild) {
+      player2Area.lastChild.remove();
     }
   }
 
@@ -43,21 +58,11 @@ const DisplayController = (() => {
         row[index] = " ";
       });
     })
+    _clearInfo();
     _clearBoard();
   }
-
-  // const refreshBoard = () => {
-  //   Board.grid.forEach(row => {
-  //     row.forEach((square, index, row) => {
-  //       let y = Number(square.getAttribute("y-position"));
-  //       let x = Number(square.getAttribute("x-position"));
-  //       row[index] = " ";
-  //     });
-  //   })
-  // }
   
   const displayBoard = () => {
-    // _clearBoard();
     let i = 0;
     let j = 0;
     Board.grid.forEach(row => {
@@ -84,7 +89,7 @@ const DisplayController = (() => {
           space.classList.add("clicked");
           Board.grid[y][x] = currentPlayer.getSymbol();
           space.textContent = currentPlayer.getSymbol();
-          switchPlayer();
+          newGame.checkWinCondition();
           ticker.textContent = `It's ${currentPlayer.getName()}'s turn.`;
         }
         // DisplayController.refreshBoard();
@@ -96,19 +101,17 @@ const DisplayController = (() => {
 })();
 
 // Factory function for Players
-
 const Player = (name, symbol) => {
   const getName = () => name;
   const getSymbol = () => symbol;
-
   return { getName, getSymbol };
 }
 
 // Factory function for Game
-
 const Game = () => {
   const _wonRow = (row) => {
-    return row.every(square => square == "X" || square == "O");
+    return row.every(square => square == playerX.getSymbol()) ||
+      row.every(square => square == playerO.getSymbol());
   }
   
   const _winner = () => {
@@ -127,42 +130,141 @@ const Game = () => {
     return _winner() || _fullBoard();
   }
 
+  const _gameOverMessage = () => {
+    let endGameOverlay = document.createElement("div");
+    endGameOverlay.classList.add("overlay");
+    let endGameText = document.createElement("p");
+    if (_winner) {
+      endGameText.textContent = `${currentPlayer.getName()} wins!`
+    } else {
+      endGameText.textContent = "It's a draw!"
+    }
+    let restartButton = document.createElement("button");
+    restartButton.textContent = "Play again?";
+    restartButton.addEventListener("click", newGameCallback);
+
+    endGameOverlay.appendChild(endGameText);
+    endGameOverlay.appendChild(restartButton);
+    gameArea.appendChild(endGameOverlay);
+  }
+
+  const checkWinCondition = () => {
+    if (_gameOver()) {
+      console.log(`${currentPlayer.getName()} wins!!`);
+      _gameOverMessage();
+    } else {
+      switchPlayer();
+    }
+  }
+
   const play = (player1, player2) => {
     DisplayController.displayBoard();
-    // let currentPlayer = player1;
+    currentPlayer = player1;
     if(_gameOver()) {
       console.log("Game is over!");
     }
     // Display whose turn it is
-    ticker.textContent = `It's ${currentPlayer.getName()}'s turn.`;
+    player1Area.classList.add("is-turn");
 
-    // "Turn" function that waits for player to click on a square
-    //     and then fills the square in
-    // let y = prompt("Y coordinate?");
-    // let x = prompt("X coordinate?");
-    // let mark = prompt("'X' or 'O'?");
-    // Board.grid[y][x] = mark;
-    // Switches player
   }
 
-  return { play };
+  return { play, checkWinCondition };
 }
 
-playerX = Player("John", "X");
-playerY = Player("Jane", "O");
-
 // Global event listeners
-startButton.addEventListener("click", () => {
+newGameButton.addEventListener("click", newGameCallback);
+  
+function newGameCallback() {
   DisplayController.resetBoard();
-  let newGame = Game();
-  newGame.play(playerX, playerY);
-})
+  newGameButton.textContent = "Restart";
 
-let currentPlayer = playerX;
+  // Button to start game once names have been entered
+  let startButton = document.createElement("button");
+  startButton.textContent = "Begin";
+  gameArea.appendChild(startButton);
+
+  startButton.addEventListener("click", () => {
+    if (playerX && playerO) {
+      gameArea.removeChild(startButton);
+      newGame = Game();
+      newGame.play(playerX, playerO);
+    } else {
+      console.log("Not ready yet!");
+    }
+  })
+
+  // Form for playerX name
+  let form1 = document.createElement("form");
+  player1Area.appendChild(form1);
+  let setXSymbol = document.createElement("input");
+  setXSymbol.setAttribute("type", "hidden");
+  setXSymbol.setAttribute("name", "symbol");
+  setXSymbol.setAttribute("value", "X");
+  form1.appendChild(setXSymbol);
+
+  let namePrompt1 = document.createElement("input");
+  namePrompt1.classList.add("name-prompt", "name-one");
+  namePrompt1.setAttribute("name", "name")
+  namePrompt1.setAttribute("placeholder", "Enter player name");
+  form1.appendChild(namePrompt1);
+  let nameButton1 = document.createElement("button");
+  nameButton1.classList.add("name-one");
+  nameButton1.textContent = "Submit";
+  nameButton1.setAttribute("type", "submit");
+  form1.appendChild(nameButton1);
+
+  form1.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let nameData = e.target.elements;
+    playerX = Player(nameData.name.value, nameData.symbol.value);
+    console.log(playerX.getName(), playerX.getSymbol());
+
+    player1Area.removeChild(form1);
+
+    let playerXName = document.createElement("h3");
+    playerXName.classList.add("player-name");
+    playerXName.textContent = playerX.getName();
+    player1Area.appendChild(playerXName);
+  })
+
+  // Form for playerO name
+  let form2 = document.createElement("form");
+  player2Area.appendChild(form2);
+  let setOSymbol = document.createElement("input");
+  setOSymbol.setAttribute("type", "hidden");
+  setOSymbol.setAttribute("name", "symbol");
+  setOSymbol.setAttribute("value", "O");
+  form2.appendChild(setOSymbol);
+
+  let namePrompt2 = document.createElement("input");
+  namePrompt2.classList.add("name-prompt", "name-two");
+  namePrompt2.setAttribute("name", "name")
+  namePrompt2.setAttribute("placeholder", "Enter player name");
+  form2.appendChild(namePrompt2);
+  let nameButton2 = document.createElement("button");
+  nameButton2.classList.add("name-two");
+  nameButton2.textContent = "Submit";
+  nameButton2.setAttribute("type", "submit");
+  form2.appendChild(nameButton2);
+
+  form2.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let nameData = e.target.elements;
+    playerO = Player(nameData.name.value, nameData.symbol.value);
+    console.log(playerO.getName(), playerO.getSymbol());
+
+    player2Area.removeChild(form2);
+
+    let playerOName = document.createElement("h3");
+    playerOName.classList.add("player-name");
+    playerOName.textContent = playerO.getName();
+    player2Area.appendChild(playerOName);
+  })
+}
 
 const switchPlayer = () => {
   if (currentPlayer == playerX) {
-    currentPlayer = playerY;
+    currentPlayer = playerO;
   } else {
     currentPlayer = playerX;
   }
