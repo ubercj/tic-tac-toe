@@ -150,6 +150,18 @@ h3 {
   font-size: 1.75rem;
 }
 
+.ready-text {
+  font-size: 1.15rem;
+  font-weight: bold;
+  position: absolute;
+  top: 20%;
+  color: rgb(202, 5, 5);
+}
+
+.ready {
+  color: green;
+}
+
 /* ==========================
 Buttons
 =========================== */
@@ -181,6 +193,10 @@ button:hover {
 .new-game {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+
+button[disabled="true"] {
+  background-color: grey;
 }
 
 /* ==========================

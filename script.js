@@ -3,6 +3,10 @@ const gameArea = document.querySelector(".game-area");
 const newGameButton = document.querySelector(".new-game");
 const playerXArea = document.querySelector(".player1");
 const playerOArea = document.querySelector(".player2");
+const playerXMessage = document.createElement("p");
+const playerOMessage = document.createElement("p");
+const startButton = document.createElement("button");
+const readyText = document.createElement("p");
 
 // Global variables
 let playerX;
@@ -46,6 +50,7 @@ const DisplayController = (() => {
   const _clearHighlights = () => {
     playerXArea.classList.remove("is-turn");
     playerOArea.classList.remove("is-turn");
+    readyText.classList.remove("ready");
   }
   
   const _clearInfo = () => {
@@ -199,20 +204,36 @@ const Game = () => {
 newGameButton.addEventListener("click", newGameCallback);
 
 const createStartButton = () => {
+  createReadyText();
   newGameButton.textContent = "Restart";
-  let startButton = document.createElement("button");
   startButton.textContent = "Begin";
+  startButton.setAttribute("disabled", "true");
   gameArea.appendChild(startButton);
 
   startButton.addEventListener("click", () => {
     if (playerX && playerO) {
       gameArea.removeChild(startButton);
+      gameArea.removeChild(readyText);
+      playerXArea.removeChild(playerXMessage);
+      playerOArea.removeChild(playerOMessage);
       newGame = Game();
       newGame.play();
-    } else {
-      console.log("Not ready yet!");
     }
   })
+}
+
+const createReadyText = () => {
+  readyText.textContent = "Enter names for both players"
+  readyText.classList.add("ready-text");
+  gameArea.appendChild(readyText);
+}
+
+const checkReady = () => {
+  if (playerX && playerO) {
+    startButton.removeAttribute("disabled");
+    readyText.classList.add("ready");
+    readyText.textContent = "Ready to go!";
+  }
 }
 
 const createPlayerX = (nameData, form) => {
@@ -225,9 +246,8 @@ const createPlayerX = (nameData, form) => {
   playerXName.textContent = playerX.getName();
   playerXArea.appendChild(playerXName);
   // Add player ready
-  let playerReadyMessage = document.createElement("p");
-  playerReadyMessage.textContent = `${playerX.getName()} is ready!`;
-  playerXArea.appendChild(playerReadyMessage);
+  playerXMessage.textContent = `${playerX.getName()} is ready!`;
+  playerXArea.appendChild(playerXMessage);
 }
 
 const createPlayerO = (nameData, form) => {
@@ -240,9 +260,8 @@ const createPlayerO = (nameData, form) => {
   playerOName.textContent = playerO.getName();
   playerOArea.appendChild(playerOName);
   // Add player ready
-  let playerReadyMessage = document.createElement("p");
-  playerReadyMessage.textContent = `${playerO.getName()} is ready!`;
-  playerOArea.appendChild(playerReadyMessage);
+  playerOMessage.textContent = `${playerO.getName()} is ready!`;
+  playerOArea.appendChild(playerOMessage);
 }
 
 const createPlayerXForm = () => {
@@ -271,6 +290,7 @@ const createPlayerXForm = () => {
     e.preventDefault();
     let nameData = e.target.elements;
     createPlayerX(nameData, form1);
+    checkReady();
   })
 }
 
@@ -300,6 +320,7 @@ const createPlayerOForm = () => {
     e.preventDefault();
     let nameData = e.target.elements;
     createPlayerO(nameData, form2);
+    checkReady();
   })
 }
 
@@ -327,5 +348,3 @@ const switchPlayer = () => {
     playerXArea.classList.add("is-turn");
   }
 }
-
-// TODO: Grey out button + new game with same players
