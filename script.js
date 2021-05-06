@@ -42,6 +42,11 @@ const DisplayController = (() => {
       gameArea.lastChild.remove();
     }
   }
+
+  const _clearHighlights = () => {
+    playerXArea.classList.remove("is-turn");
+    playerOArea.classList.remove("is-turn");
+  }
   
   const _clearInfo = () => {
     while (playerXArea.firstChild) {
@@ -50,8 +55,7 @@ const DisplayController = (() => {
     while (playerOArea.firstChild) {
       playerOArea.lastChild.remove();
     }
-    playerXArea.classList.remove("is-turn");
-    playerOArea.classList.remove("is-turn");
+    _clearHighlights();
     playerX = null;
     playerO = null;
   }
@@ -84,12 +88,17 @@ const DisplayController = (() => {
 
   // Public
   const resetBoard = () => {
+    quickReset();
+    _clearInfo();
+  }
+
+  const quickReset = () => {
     Board.grid.forEach(row => {
       row.forEach((square, index, row) => {
         row[index] = " ";
       });
     })
-    _clearInfo();
+    _clearHighlights();
     _clearBoard();
   }
   
@@ -112,7 +121,7 @@ const DisplayController = (() => {
     _createSpaceListeners();
   }
 
-    return { displayBoard, resetBoard };
+    return { displayBoard, resetBoard, quickReset };
 })();
 
 // Factory function for Players
@@ -128,8 +137,11 @@ const Game = () => {
   endGameOverlay.classList.add("overlay");
   let endGameText = document.createElement("p");
   let restartButton = document.createElement("button");
-  restartButton.textContent = "Play again?";
+  restartButton.textContent = "New Game";
   restartButton.addEventListener("click", newGameCallback);
+  let quickRestartButton = document.createElement("button");
+  quickRestartButton.textContent = "Rematch"
+  quickRestartButton.addEventListener("click", quickNewGameCallback);
 
   // Private functions
   const _wonRow = (row) => {
@@ -160,6 +172,7 @@ const Game = () => {
       endGameText.textContent = "It's a draw!"
     }
     endGameOverlay.appendChild(endGameText);
+    endGameOverlay.appendChild(quickRestartButton);
     endGameOverlay.appendChild(restartButton);
     gameArea.appendChild(endGameOverlay);
   }
@@ -288,6 +301,12 @@ const createPlayerOForm = () => {
     let nameData = e.target.elements;
     createPlayerO(nameData, form2);
   })
+}
+
+function quickNewGameCallback() {
+  DisplayController.quickReset();
+  newGame = Game();
+  newGame.play();
 }
 
 function newGameCallback() {
